@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拉鍊損壞統計</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>拉鍊損壞統計</h1>
+    </header>
+
+    <section id="damageStats">
+        <h2>損壞次數</h2>
+        <p>損壞次數：<span id="damageCounter">0</span></p>
+        <canvas id="damageChart"></canvas>
+    </section>
+    
+    <section id="feedStats">
+        <h2>進料統計</h2>
+        <p>進料次數：<span id="feedCounter">0</span></p>
+    </section>
+    
+
+    <section id="controls">
+        <button id="resetButton">重置計數器</button>
+        <button id="downloadReport">下載報告</button>
+    </section>
+
+    <footer>
+        <p>© 2023 拉鍊損壞統計系統</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
