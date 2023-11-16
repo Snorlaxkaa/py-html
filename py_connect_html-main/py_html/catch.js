@@ -1,4 +1,5 @@
 const damageCounter = document.getElementById('damageCounter');
+const feedCounter = document.getElementById('feedCounter');
 const resetButton = document.getElementById('resetButton');
 const downloadReport = document.getElementById('downloadReport');
 const damageChartCtx = document.getElementById('damageChart').getContext('2d');
@@ -28,41 +29,65 @@ let damageChart = new Chart(damageChartCtx, {
     }
 });
 
-// 更新數據
-function updateData() {
-    fetch('path/to/your/folder/file.json')
-        .then(response => response.json())
-        .then(data => {
-            damageCounter.textContent = data.num;
-            // 更新圖表數據
-            damageData.push(data.num);
-            damageChart.data.labels.push(new Date().toLocaleTimeString());
-            damageChart.data.datasets[0].data = damageData;
-            damageChart.update();
-        })
-        .catch(error => console.error('Error:', error));
+// 更新當前日期，僅保留一個函數定義
+function updateCurrentDate() {
+    const currentDateElement = document.getElementById('currentDate');
+    if (currentDateElement) {
+        const now = new Date();
+        const dateString = now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' });
+        currentDateElement.textContent = dateString;
+        console.log('當前日期已更新:', dateString); // 調試日志
+    } else {
+        console.error('無法找到顯示當前日期的元素');
+    }
 }
-const feedCounter = document.getElementById('feedCounter');
+
+// 當頁面加載時更新日期
+document.addEventListener('DOMContentLoaded', updateCurrentDate);
+
+// 其他功能省略... 保持不變
+
+
+// 定時更新損壞統計數據
+setInterval(updateDamageData, updateInterval);
 
 // 更新進料統計數據
-function updateFeedData() {
-    fetch('path/to/your/folder/feedData.json') // 這裡的路徑應該指向存儲進料次數的JSON檔案
-        .then(response => response.json())
-        .then(data => {
-            feedCounter.textContent = data.feedCount; // 假設JSON檔案中有一個feedCount屬性
-        })
-        .catch(error => console.error('Error:', error));
+async function updateFeedData() {
+    try {
+        const response = await fetch('path/to/your/feedData.json');
+        const data = await response.json();
+        feedCounter.textContent = data.feedCount;
+    } catch (error) {
+        console.error('更新進料數據時發生錯誤：', error);
+    }
 }
-
-// 定時更新數據
-setInterval(updateData, updateInterval);
 
 // 重置計數器
 resetButton.addEventListener('click', () => {
-    // 實現重置邏輯
+    damageData = [];
+    damageChart.data.labels = [];
+    damageChart.data.datasets[0].data = [];
+    damageChart.update();
 });
 
 // 下載報告
-downloadReport.addEventListener('click', () => {
-    // 實現下載報告邏輯
+downloadReport.addEventListener('click', async () => {
+    try {
+        const response = await fetch('path/to/your/report.json');
+        if (!response.ok) {
+            throw new Error(`無法抓取報告文件`);
+        }
+        const data = await response.json();
+        const reportBlob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const downloadUrl = URL.createObjectURL(reportBlob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = 'report.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+        console.error('下載報告時發生錯誤：', error.message);
+    }
 });
